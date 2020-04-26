@@ -1,0 +1,87 @@
+title: Group
+type: object
+x-tags:
+  - Group
+description: Descriptor for every Group / Chat where messages are exchanged
+properties:
+  id:
+    type: integer
+  type:
+    type: string
+    enum:
+      - PERSONAL_CHAT
+      - GROUP
+  name:
+    type: string
+  organization:
+    type: string
+  desc:
+    type: string
+  photo:
+    type: string
+  admins:
+    type: array
+    items:
+      type: string
+  members:
+    type: array
+    items:
+      type: string
+  props:
+    type: array
+    items:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - ALLOW_CHAT_BOT_PROMPT_FOR_JOBS
+            - HAS_ANALYTICS
+            - IS_ADMIN_POSTING
+            - IS_PRIVATE
+            - SHOW_MEMBER_ADD_NOTIFICATIONS
+            - HYPERLOCAL_CONTENT
+        value:
+          type: boolean
+  metadata:
+    type: object
+    properties:
+      createdAt:
+        type: integer
+        format: int64
+      updatedAt:
+        type: integer
+        format: int64
+      startWatermark:
+        type: integer
+        format: int64
+  isDeleted:
+    type: boolean
+required:
+  - id
+  - type
+  - name
+  - photo
+  - admins
+  - members
+  - props
+  - metadata
+x-examples:
+  Group example:
+    id: 1
+    name: Foodcloud Bangalore chefs
+    type: GROUP
+    photo: ''
+    admins:
+      - vedant
+    members:
+      - kumar
+      - gagan
+      - vedant
+      - john
+    props:
+      - type: HAS_ANALYTICS
+        value: true
+    metadata:
+      createdAt: 1585715619000
+

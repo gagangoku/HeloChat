@@ -1,0 +1,221 @@
+title: Message
+type: object
+x-tags:
+  - Message
+x-examples:
+  Text message:
+    id: 1
+    groupId: 23
+    timestamp: 1587875620000
+    changeType: ADD
+    payload:
+      type: TEXT
+      sender: user1
+      text: Hi
+  Shopping list:
+    id: 1
+    groupId: 23
+    timestamp: 1587875620000
+    changeType: ADD
+    payload:
+      type: SHOPPING_CART
+      sender: user1
+      shoppingCart:
+        title: Food items
+        allSku:
+          - photo: 'https://cafedelites.com/wp-content/uploads/2019/01/Butter-Chicken-IMAGE-64.jpg'
+            title: Butter chicken -Half
+            subHeading: less spicy please
+            price: 150
+            skuId: item1
+          - photo: 'https://www.whiskaffair.com/wp-content/uploads/2016/02/Achari-Paneer-Tikka-4-500x500.jpg'
+            title: Achari Paneer Tikka
+            subHeading: ''
+            price: 120
+            skuId: item2
+          - photo: 'https://i.pinimg.com/originals/58/7b/90/587b90c4d849849a6c3fa9fda9555a0a.jpg'
+            title: Tandoori roti
+            subHeading: garam
+            price: 15
+            skuId: item3
+          - photo: 'https://www.sandyathome.com/wp-content/uploads/2017/10/jal-jeera-recipe.png'
+            title: Jal jeera
+            subHeading: Teekha
+            price: 70
+            skuId: item4
+        cart:
+          - skuId: item1
+            quantity: 3
+          - skuId: item2
+            quantity: 2
+          - skuId: item3
+            quantity: 4
+          - skuId: item4
+            quantity: 1
+        metadata:
+          - key: summaryShowZeros
+            value: 'true'
+description: Model for every message that is exchanged or needs to be sent.
+properties:
+  id:
+    type: string
+    description: Unique message ID. This will be set for every message that is processed in the system
+  groupId:
+    type: string
+    description: Identifier for the group / chat this message was shared in.
+  timestamp:
+    type: integer
+    format: int64
+  changeType:
+    type: string
+    enum:
+      - ADD
+      - UPDATE
+      - DELETE
+  payload:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - TEXT
+          - IMAGE
+          - AUDIO
+          - VIDEO
+          - FILE
+          - PDF
+          - LOCATION
+          - PROGRESSIVE_MODULE
+          - EXCEL
+          - NEW_JOINEE
+          - SYSTEM_MESSAGE
+          - SINGLE_CHOICE
+          - MULTIPLE_CHOICE
+          - PLACES_AUTOCOMPLETE
+          - TASK_LIST
+          - SHOPPING_CART
+      systemMessageType:
+        type: string
+        enum:
+          - GROUP_CREATED
+          - CHAT_CREATED
+          - USER_ADDED
+          - USER_LEFT
+          - USER_REMOVED
+      s2Cell:
+        type: integer
+        format: int64
+      sender:
+        type: string
+        description: |
+          The userId of the message sender
+      text:
+        type: string
+        description: 'In case of text messages, what text to display'
+      imageUrl:
+        type: string
+      videoUrl:
+        type: string
+      audioUrl:
+        type: string
+      fileUrl:
+        type: string
+      excel:
+        type: object
+        properties:
+          title:
+            type: string
+          cells:
+            type: array
+            items:
+              type: object
+              properties:
+                rowId:
+                  type: integer
+                colId:
+                  type: integer
+                val:
+                  type: string
+      taskList:
+        type: object
+        properties:
+          title:
+            type: string
+          tasks:
+            type: array
+            items:
+              type: object
+              properties:
+                title:
+                  type: string
+                desc:
+                  type: string
+                options:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      text:
+                        type: string
+                optionSelected:
+                  type: array
+                  items:
+                    type: string
+                images:
+                  type: array
+                  items:
+                    type: string
+                comments:
+                  type: string
+                isFinalized:
+                  type: boolean
+      shoppingCart:
+        type: object
+        properties:
+          title:
+            type: string
+          allSku:
+            type: array
+            items:
+              type: object
+              properties:
+                photo:
+                  type: string
+                title:
+                  type: string
+                subHeading:
+                  type: string
+                price:
+                  type: number
+                skuId:
+                  type: string
+          cart:
+            type: array
+            items:
+              type: object
+              properties:
+                skuId:
+                  type: string
+                quantity:
+                  type: string
+          metadata:
+            type: array
+            items:
+              type: object
+              properties:
+                key:
+                  type: string
+                value:
+                  type: string
+      options:
+        type: array
+        items:
+          type: string
+    required:
+      - type
+      - sender
+required:
+  - groupId
+  - timestamp
+  - changeType
+
