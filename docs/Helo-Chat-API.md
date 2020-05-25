@@ -131,7 +131,7 @@ const FOOD_CART_SKU = [
 ---
 
 ## Full code for reference
-See the full working example:
+See the full working example for NodeJS (download the helochat js inside lib/ folder):
 
 ```javascript
 const Helo = require('../lib/helo-chat-3.0.2-min');
