@@ -32,7 +32,7 @@ The pretty text, image, video messages and custom task lists / shopping carts yo
 Now that we have a handle on the basic terminology, we will write a simple bot that sends a `Hi` message and a shopping cart to a user.
 
 
-We use the Helo Chat API library from the [Helo Staging server](https://staging.heloprotocol.in/assets/chat.js) and make a `HeloChatClient` which enables communication the server.
+We use the Helo Chat API library from the [Helo Staging server](https://staging.heloprotocol.in/static/lib/helo-chat-3.0.2-min.js) and make a `HeloChatClient` which enables communication the server.
 We use a `LocalDataStore` which enables storing data locally so you can get diffs easily. You can provide your own custom implementation, but we suggest start with the one provided.
 
 
@@ -90,7 +90,7 @@ How do you send this message, you define the schema, the UI layer. Here's the co
     allSku: FOOD_SKU_LIST,
     cart: FOOD_CART_SKU,
     title: 'Shopping list',
-    metadata: [{ key: 'deliveryDate', value: '23 April' }, { key: 'deliveryTime', value: '3 pm' }, { key: 'cookId', value: 'supply:352' }],
+    metadata: [{ key: 'deliveryDate', value: '23 April' }, { key: 'deliveryTime', value: '3 pm' }, { key: 'cookId', value: '<ID of cook>' }],
   };
   await client.newMessage(groupId, { type: 'SHOPPING_CART', shoppingCart });
 
@@ -134,56 +134,59 @@ const FOOD_CART_SKU = [
 See the full working example:
 
 ```javascript
-export default class App extends React.Component {
-    componentDidMount() {
-        const aScript = document.createElement('script');
-        aScript.type = 'text/javascript';
-        aScript.src = SCRIPT_SRC;
+const Helo = require('../lib/helo-chat-3.0.2-min');
+console.log('Helo: ', Helo);
 
-        document.head.appendChild(aScript);
-        aScript.onload = this.onLoad;
-    }
 
-    onLoad = async () => {
-        console.log('Loaded: ', window.Helo);
-        const { LocalDataStore, HeloChatClient } = window.Helo || {};
+const createClient = async () => {
+    const {LocalDataStore, HeloChatClient} = Helo || {};
 
-        const userId = USER_TEST_1;
-        const localDataStore = await LocalDataStore.create(userId);
-        const client = await HeloChatClient({ userId, localDataStore, apiKey: API_KEY, authMethod: AUTH_METHOD });
+    const userId = USER_FOODCLOUD_ORDERS;
+    const localDataStore = await LocalDataStore.create(userId);
+    const client = await HeloChatClient({ userId, localDataStore, apiKey: API_KEY, authMethod: AUTH_METHOD });
+    await client.waitTillReady();
+    return client;
+};
 
-        // Get the group id to be able to chat with the user.
-        const groupId = await client.getGroupIdForChat(USER_GAGAN, true);
+const sendHi = async (client) => {
+    const payload = { type: 'TEXT', sender: USER_FOODCLOUD_ORDERS, text: 'Hi from client' };
+    await client.newMessage(GRUOP_ID_TO_MESSAGE, payload);
+};
+const sendOrder = async (client) => {
+    // Get the group id to be able to chat with the user.
+    const groupId = await client.getGroupIdForChat(USER_GAGAN, true);
 
-        // Listen to new messages
-        const listenerId = client.addEventListener({ newMessagesForGroupId: groupId }, this);
-
-        // Send a Hi
-        await client.newMessage(groupId, { type: 'TEXT', text: 'Hi' });
-
-        // Send a custom shopping cart
-        const shoppingCart = {
-            allSku: FOOD_SKU_LIST,
-            cart: FOOD_CART_SKU,
-            title: 'Shopping list',
-            metadata: [{ key: 'deliveryDate', value: '23 April' }, { key: 'deliveryTime', value: '3 pm' }, { key: 'cookId', value: 'supply:352' }],
-        };
-        await client.newMessage(groupId, { type: 'SHOPPING_CART', shoppingCart });
-
-        //  Wait 5 seconds, remove the event listener and close the client when done
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        client.removeEventListener(listenerId);
-        client.close();
+    // Setup listener - it will Listen to new messages
+    const listenerObj = {
+        on: async ({ homeView, message }) => {
+            console.log('[Listener] on: ', { homeView, message });
+        },
     };
+    const listenerId = client.addEventListener({ newMessagesForGroupId: groupId }, listenerObj);
 
-    on = async ({ homeView, message }) => {
-        console.log('[Listener] on: ', { homeView, message });
+    // Send a text message
+    await client.newMessage(groupId, { type: 'TEXT', text: 'New order' });
+
+    // Send a custom shopping cart
+    const shoppingCart = {
+        allSku: FOOD_SKU_LIST,
+        cart: FOOD_CART_SKU,
+        title: 'Shopping list',
+        metadata: [{ key: 'deliveryDate', value: '23 April' }, { key: 'deliveryTime', value: '3 pm' }, { key: 'cookId', value: USER_COOK }],
     };
+    await client.newMessage(groupId, { type: 'SHOPPING_CART', shoppingCart });
 
-    render() {
-        return (<div>Hi</div>);
-    }
-}
+    //  Wait 5 seconds, remove the event listener and close the client when done
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    client.removeEventListener(listenerId);
+};
+
+const main = async () => {
+    const client = await createClient();
+    await sendHi(client);
+    await sendOrder(client);
+};
+
 
 const FOOD_SKU_LIST = [{
     photo: 'https://cafedelites.com/wp-content/uploads/2019/01/Butter-Chicken-IMAGE-64.jpg',
@@ -217,13 +220,15 @@ const FOOD_CART_SKU = [
     { skuId: 'item4', quantity: 1 },
 ];
 
-const SCRIPT_SRC = 'https://staging.heloprotocol.in/assets/chat.js';
+const USER_GAGAN = 'visitor:1';
+const USER_COOK = 'visitor:2';
+const GRUOP_ID_TO_MESSAGE = '36';
+const USER_FOODCLOUD_ORDERS = 'visitor:5';
 const API_KEY = '<Your key here>';
 const AUTH_METHOD = 'v1';
-const USER_TEST_1 = 'visitor:6';
-const USER_TEST_2 = 'visitor:7';
-const USER_VEDANT = 'visitor:2';
-const USER_GAGAN = 'visitor:1';
+
+main();
+
 
 ```
 
