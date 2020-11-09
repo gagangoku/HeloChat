@@ -6,7 +6,7 @@ This article describes how to setup webhooks for receiving order updates (for or
 > -Leonardo da Vinci
 
 There are 3 simple steps to follow:
-1. **Webhook URL** - Email the webhook url to tech@heloprotocol.in and we'll configure out backend
+1. **Webhook URL** - Email the webhook url to tech@heloprotocol.in and we'll configure it in our backend
 2. **Staged order notifications** - STAGED orders are unpaid orders which are captured before the customer completes the payment. These can be mostly ignored.
 3. **Payment notifications** - an order is PLACED once the payment is successful. This is a confirmed order that you should process.
 
