@@ -1,4 +1,4 @@
-# Helo-Orders-Webhooks
+# Helo orders - Webhooks
 
 This article describes how to setup webhooks for receiving order updates (for orders you get through the HeloProtocol app).
 
